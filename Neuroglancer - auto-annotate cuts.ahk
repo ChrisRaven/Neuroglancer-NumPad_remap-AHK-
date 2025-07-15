@@ -1,0 +1,90 @@
+﻿#Requires AutoHotkey v2.0
+#SingleInstance Force
+SetTitleMatchMode 2  ; Partial title match
+
+isClicking := false
+autoClickerRunning := false
+
+IsNeuroglancerActive() {
+  return WinActive("neuroglancer")
+}
+
+DoClick() {
+  if !IsNeuroglancerActive() || !GetKeyState("NumpadSub", "P") {
+    StopAutoClicker()
+    return
+  }
+  SendEvent '{Ctrl down}'
+  Click
+  SendEvent '{Ctrl up}'
+}
+
+StartAutoClicker() {
+  global autoClickerRunning
+  if !autoClickerRunning {
+    SetTimer DoClick, 200
+    autoClickerRunning := true
+  }
+}
+
+StopAutoClicker() {
+  global autoClickerRunning
+  SetTimer DoClick, 0
+  autoClickerRunning := false
+}
+
+; Apply #HotIf to all hotkeys
+#HotIf IsNeuroglancerActive()
+
+NumpadHome::Send "m"      ; NumLock off: Numpad7
+NumpadUp::Send "c"        ; NumLock off: Numpad8
+NumpadPgUp::Send "g"      ; NumLock off: Numpad9
+NumpadEnter::Send "{Space}"
+NumpadPgDn Up::Send "x"
+NumpadDiv::Send "l"       ; Numpad slash
+NumpadMult::Send "{Enter}" ; Numpad asterisk
+NumpadDown::Send "2"
+NumpadEnd::{
+  SendEvent "{Shift down}"
+  Click
+  Sleep(50)
+  Click
+  SendEvent "{Shift up}"
+}
+NumpadIns:: Send "f"
+
+NumpadSub::{
+  StartAutoClicker()
+}
+
+NumpadSub Up::{
+  StopAutoClicker()
+}
+
+NumpadRight::{
+  SendEvent "{Ctrl down}"
+}
+
+NumpadRight Up::{
+  SendEvent "{Ctrl up}"
+}
+
+NumpadClear::{
+  SendEvent "{Shift down}"
+}
+
+NumpadClear Up::{
+  SendEvent "{Shift up}"
+}
+
+NumpadLeft::{
+  SendEvent "{Ctrl down}"
+  SendEvent "{Alt down}"
+  Click "Right"
+  Sleep(200)
+  Click "Right"
+  SendEvent "{Alt up}"
+  SendEvent "{Ctrl up}"
+}
+
+#HotIf  ; Reset #HotIf to ensure hotkeys don't bleed into other contexts
