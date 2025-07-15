@@ -1,4 +1,4 @@
-﻿#Requires AutoHotkey v2.0
+#Requires AutoHotkey v2.0
 #SingleInstance Force
 SetTitleMatchMode 2  ; Partial title match
 
@@ -40,10 +40,26 @@ NumpadHome::Send "m"      ; NumLock off: Numpad7
 NumpadUp::Send "c"        ; NumLock off: Numpad8
 NumpadPgUp::Send "g"      ; NumLock off: Numpad9
 NumpadEnter::Send "{Space}"
-NumpadPgDn Up::Send "x"
 NumpadDiv::Send "l"       ; Numpad slash
 NumpadMult::Send "{Enter}" ; Numpad asterisk
 NumpadDown::Send "2"
+
+lastPgDnTime := 0
+
+NumpadPgDn Up::
+{
+  static doubleTapThreshold := 400  ; milliseconds
+  global lastPgDnTime
+
+  currentTime := A_TickCount
+  if (currentTime - lastPgDnTime <= doubleTapThreshold) {
+    Send("x")
+    lastPgDnTime := 0  ; reset
+  } else {
+    lastPgDnTime := currentTime
+  }
+}
+
 NumpadEnd::{
   SendEvent "{Shift down}"
   Click
