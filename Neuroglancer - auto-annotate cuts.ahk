@@ -8,12 +8,18 @@ lastClickX := 0
 lastClickY := 0
 minDistance := 10  ; pixels
 
+minX := 1
+maxX := 1600
+minY := 200
+maxY := 1030
+
 IsNeuroglancerActive() {
   return WinActive("neuroglancer")
 }
 
 DoClick() {
   global lastClickX, lastClickY, minDistance, clickerEnabled
+  global minX, maxX, minY, maxY
 
   if !IsNeuroglancerActive() || !clickerEnabled {
     StopAutoClicker()
@@ -21,6 +27,10 @@ DoClick() {
   }
 
   MouseGetPos &x, &y
+  
+  if (x < minX || x > maxX || y < minY || y > maxY)
+  return
+  
   dx := x - lastClickX
   dy := y - lastClickY
   distance := Sqrt(dx**2 + dy**2)
@@ -72,24 +82,32 @@ NumpadPgDn Up:: {
   }
 }
 
-SwitchColorAndStartAutoClicker(color) {
+SwitchColorAndStartAutoClicker(correctColor, incorrectColor) {
+  inCuttingMode := false
   global clickerEnabled
   color1 := PixelGetColor(275, 1055, "RGB")
-  if (color1 = color) {
+  color2 := PixelGetColor(275, 1035, "RGB")
+  
+  if (color1 = correctColor) {
+  }
+  else if (color1 = incorrectColor) {
+    Send "g"
+  }
+  else if (color2 = correctColor) {
+  }
+  else if (color2 = incorrectColor) {
     Send "g"
   }
   else {
-    color2 := PixelGetColor(275, 1035, "RGB")
-    if (color2 = color) {
-      Send "g"
-    }
+    return
   }
+
   clickerEnabled := true
   StartAutoClicker()
 }
 
-NumpadPgUp:: SwitchColorAndStartAutoClicker(0x0000FF)
-NumPadSub:: SwitchColorAndStartAutoClicker(0xFF0000)
+NumpadPgUp:: SwitchColorAndStartAutoClicker(0xFF0000, 0x0000FF)
+NumPadSub:: SwitchColorAndStartAutoClicker(0x0000FF, 0xFF0000)
 
 NumPadPgUp Up::
 NumpadSub Up:: {
