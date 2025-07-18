@@ -82,32 +82,23 @@ NumpadPgDn Up:: {
   }
 }
 
-SwitchColorAndStartAutoClicker(correctColor, incorrectColor) {
-  inCuttingMode := false
+SwitchColorAndStartAutoClicker(incorrectColor) {
   global clickerEnabled
-  color1 := PixelGetColor(275, 1055, "RGB")
-  color2 := PixelGetColor(275, 1035, "RGB")
-  
-  if (color1 = correctColor) {
-  }
-  else if (color1 = incorrectColor) {
-    Send "g"
-  }
-  else if (color2 = correctColor) {
-  }
-  else if (color2 = incorrectColor) {
-    Send "g"
-  }
-  else {
+  statusColor := PixelGetColor(1580, 110, "RGB")
+
+  if (statusColor = 0xA9A9A9) {
     return
+  }
+  if (statusColor = incorrectColor) {
+    Send "g"
   }
 
   clickerEnabled := true
   StartAutoClicker()
 }
 
-NumpadPgUp:: SwitchColorAndStartAutoClicker(0xFF0000, 0x0000FF)
-NumPadSub:: SwitchColorAndStartAutoClicker(0x0000FF, 0xFF0000)
+NumpadPgUp:: SwitchColorAndStartAutoClicker(0x0000FF)
+NumPadSub:: SwitchColorAndStartAutoClicker(0xFF0000)
 
 NumPadPgUp Up::
 NumpadSub Up:: {
@@ -140,3 +131,42 @@ NumpadLeft:: {
 }
 
 #HotIf
+
+
+
+/*
+// ==UserScript==
+// @name         Multicut State Watcher
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  Indicates the state of the multicut
+// @match        https://spelunker.cave-explorer.org/*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+  'use strict'
+
+  const observer = new MutationObserver(() => {
+    const indicator = document.querySelector('.activeGroupIndicator')
+    const button = document.querySelector('.neuroglancer-tool-palette-button')
+
+    if (!button) return
+
+    if (!indicator) {
+      button.style.backgroundColor = 'darkgray'
+    } else if (indicator.classList.contains('blueGroup')) {
+      button.style.backgroundColor = '#0000ff'
+    } else {
+      button.style.backgroundColor = '#ff0000'
+    }
+  })
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['class']
+  })
+})()
+*/
